@@ -23,6 +23,8 @@
 </template>
 
 <script>
+var apiLink = "https://react-blog-api.bahdcasts.com/api/auth/register";
+import Axios from 'axios';
 
 export default {
   data() {
@@ -34,6 +36,18 @@ export default {
   },
   methods: {
     registerUser() {
+      Axios.post(apiLink, {
+        name: this.name,
+        email: this.email,
+        password: this.password
+      }).then((response) => {
+        const { data } = response.data;
+        localStorage.setItem('auth', JSON.stringify(data));
+        // $root - variable from main.js
+        this.$root.auth = data;
+      }).catch(({response}) => {
+        console.log(response)
+      })
       console.log(this.name, this.email, this.password);
     }
   }
