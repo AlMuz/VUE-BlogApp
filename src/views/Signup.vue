@@ -45,10 +45,10 @@ export default {
         localStorage.setItem('auth', JSON.stringify(data));
         // $root - variable from main.js
         this.$root.auth = data;
+
+        this.$router.push('home');
       }).catch(({response}) => {
-        console.log(response)
       })
-      console.log(this.name, this.email, this.password);
     }
   }
 }
