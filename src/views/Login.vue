@@ -34,13 +34,13 @@
 
 
 <script>
-
-var apiLink = "https://react-blog-api.bahdcasts.com/api/auth/login";
 import Axios from 'axios';
+import config from '@/config';
+var loginUrl =  `${config.apiUrl}/auth/login`;
 
 export default {
   beforeRouteEnter(to, from, next) {
-    
+
     if (localStorage.getItem('auth')) {
       return next({ path: "/" });
     }
@@ -59,7 +59,7 @@ export default {
     loginUser() {
 
       this.loading = true;
-      Axios.post(apiLink, {
+      Axios.post(loginUrl, {
 
         email: this.email,
         password: this.password

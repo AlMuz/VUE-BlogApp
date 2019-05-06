@@ -41,8 +41,9 @@
 </template>
 
 <script>
-var apiLink = "https://react-blog-api.bahdcasts.com/api/auth/register";
 import Axios from 'axios';
+import config from '@/config';
+var registerUrl =  `${config.apiUrl}/auth/register`;
 
 export default {
   beforeRouteEnter(to, from, next) {
@@ -67,7 +68,7 @@ export default {
     registerUser() {
 
       this.loading = true;
-      Axios.post(apiLink, {
+      Axios.post(registerUrl, {
         name: this.name,
         email: this.email,
         password: this.password
