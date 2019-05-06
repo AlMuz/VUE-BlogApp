@@ -10,7 +10,13 @@
               button-class="btn btn-danger"
               @change="onChange">
             </picture-input>
-            <input type="text" v-model="title" placeholder="Title" class="mb-3 form-control">
+            <select class="form-control my-3" v-model="category">
+              <option selected value="0">Select a category</option>
+              <option :value="category.id" :key="category.id" v-for="category in categories">
+                {{ category.name }}
+              </option>
+            </select>
+            <input type="text" v-model="title" placeholder="Title" class="my-3 form-control">
             <wysiwyg v-model="content" />
             <div class="text-center mt-3">
               <button @click="createArticle" class="btn btn-success btn-lg">Create article</button>
@@ -26,17 +32,22 @@
 
 import Axios from 'axios';
 import PictureInput from 'vue-picture-input';
+import config from '@/config';
+
+var getCategoriesUrl =  `${config.apiUrl}/categories`;
 
 export default {
   mounted() {
-    console.log(process.env)
+    this.getCategories();
   },
   components: {
     PictureInput
   },
   data() {
     return {
+      categories: [],
       title: '',
+      category: '',
       content: '',
       image: null
     }
@@ -49,12 +60,25 @@ export default {
 
       const form = new FormData();
       form.append('file', this.image);
-      form.append('upload_preset', process.env.VUE_APP_CLOUDINARY_PRESET);
+      form.append('upload_preset', process.env.VUE_APP_CLOUDINARY_PRESET );
       form.append('api_key', process.env.VUE_APP_CLOUDINARY_API_KEY);
 
       Axios.post(process.env.VUE_APP_CLOUDINARY_URL, form)
       .then(response => console.log(response));
 
+    },
+    getCategories() {
+
+      const categories = localStorage.getItem('categories');
+      if(categories) {
+        this.categories = JSON.parse(categories);
+        return
+      }
+      Axios.get(getCategoriesUrl)
+      .then(response => {
+        this.categories = response.data.categories;
+        localStorage.setItem('categories', JSON.stringify(this.categories));
+      })
     }
   }
 }
