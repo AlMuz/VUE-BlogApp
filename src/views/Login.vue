@@ -52,18 +52,22 @@ export default {
 
       this.loading = true;
       Axios.post(apiLink, {
-        
+
         email: this.email,
         password: this.password
       }).then((response) => {
 
         this.loading = false;
+        this.$noty.success('Successfully logged in.');
+
         const { data } = response.data;
         localStorage.setItem('auth', JSON.stringify(data));
         this.$root.auth = data;
-        this.$router.push('home');
+        this.$router.push('/');
       }).catch(({response}) => {
 
+        this.loading = false;
+        this.$noty.error('Oops something went wrong');
         if (response.status === 401) {
             this.errors = {
               email: ['Theese credentials do not match our records.']

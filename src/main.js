@@ -1,6 +1,10 @@
 import Vue from 'vue'
+import VueNoty from 'vuejs-noty'
+import 'vuejs-noty/dist/vuejs-noty.css'
 import App from './App.vue'
 import router from './router'
+
+Vue.use(VueNoty);
 
 Vue.config.productionTip = false
 
