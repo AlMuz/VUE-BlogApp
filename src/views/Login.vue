@@ -39,6 +39,14 @@ var apiLink = "https://react-blog-api.bahdcasts.com/api/auth/login";
 import Axios from 'axios';
 
 export default {
+  beforeRouteEnter(to, from, next) {
+    
+    if (localStorage.getItem('auth')) {
+      return next({ path: "/" });
+    }
+
+    next();
+  },
   data() {
     return {
       email: '',
