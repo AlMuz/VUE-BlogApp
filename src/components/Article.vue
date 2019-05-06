@@ -7,9 +7,9 @@
       <div class="my-3" v-html="article.content.substring(0, 200)">
         {{ article.content.substring(0, 200) }}
       </div>
-      <button class="btn btn-primary">
+      <router-link class="btn btn-primary" :to="`/article/${ article.slug }`">
         Read more
-      </button>
+      </router-link>
     </div>
   </div>
 </template>
