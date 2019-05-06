@@ -19,7 +19,10 @@
             <input type="text" v-model="title" placeholder="Title" class="my-3 form-control">
             <wysiwyg v-model="content" />
             <div class="text-center mt-3">
-              <button @click="createArticle" class="btn btn-success btn-lg">Create article</button>
+              <button :disabled="loading" @click="createArticle" class="btn btn-success btn-lg">
+                <i class="fas fa-spin fa-spinner" v-if="loading"></i>
+                {{ loading ? '' : 'Create article'}}
+              </button>
             </div>
           </div>
         </div>
@@ -35,8 +38,17 @@ import PictureInput from 'vue-picture-input';
 import config from '@/config';
 
 var getCategoriesUrl =  `${config.apiUrl}/categories`;
+var postArticlesUrl =  `${config.apiUrl}/articles`;
 
 export default {
+  beforeRouteEnter(to, from, next) {
+
+    if (!localStorage.getItem('auth')) {
+      return next({ path: "/login" });
+    }
+
+    next();
+  },
   mounted() {
     this.getCategories();
   },
@@ -49,7 +61,8 @@ export default {
       title: '',
       category: '',
       content: '',
-      image: null
+      image: null,
+      loading: false
     }
   },
   methods: {
@@ -58,13 +71,44 @@ export default {
     },
     createArticle() {
 
+      if (!this.title || !this.image || !this.category || this.content) {
+        this.$noty.error('Please fill all fields!');
+        return
+      }
+
+      this.loading = true;
       const form = new FormData();
       form.append('file', this.image);
       form.append('upload_preset', process.env.VUE_APP_CLOUDINARY_PRESET );
       form.append('api_key', process.env.VUE_APP_CLOUDINARY_API_KEY);
 
       Axios.post(process.env.VUE_APP_CLOUDINARY_URL, form)
-      .then(response => console.log(response));
+      .then(response =>
+        Axios.post(postArticlesUrl, {
+          title: this.title,
+          content: this.content,
+          category_id: this.category,
+          imageUrl: response.data.secure_url
+        }, {
+          headers: {
+            Authorization: `Bearer ${this.$root.auth.token}`
+          }
+        })
+        .then(() => {
+
+          this.loading = false;
+          this.$noty.success('Article created succesfully');
+          this.$router.push('/');
+        }).catch(() => {
+
+          this.loading = false;
+          this.$noty.error('Oops something went wrong');
+        })
+      ).catch(() => {
+
+        this.loading = false;
+        this.$noty.error('Oops something went wrong');
+      });
 
     },
     getCategories() {
